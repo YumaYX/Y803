@@ -10,11 +10,11 @@ import Cocoa
 @main
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    
-
+    var statusBar: StatusBarController?
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
+        statusBar = StatusBarController()
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -24,7 +24,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
         return true
     }
-
+    
+    @objc func quit(_ sender: Any){
+        NSApplication.shared.terminate(self)
+    }
 
 }
 

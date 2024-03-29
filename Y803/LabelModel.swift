@@ -1,0 +1,53 @@
+//
+//  LabelModel.swift
+//  Y803
+//
+//  Created by yuma on 2024/03/30.
+//
+
+import Cocoa
+
+class LabelModel: NSObject {
+    
+    var displayLabel:String = ""
+    var nowPlaying:String = ""
+    
+    override init(){
+        super.init()
+    }
+    
+    func nowplaying(){
+        if (nowPlaying.count <= 0 ){ return }
+        let encodedText = nowPlaying.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
+        if let encodedText = encodedText,
+           let url = URL(string: "https://twitter.com/intent/tweet?text=\(encodedText)") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+    
+    private func makeLabel(song:String, artist:String){
+        displayLabel = "\(song) - \(artist)"
+    }
+    
+    private func makeNowPlaying(song:String, artist:String, trackid:String){
+        nowPlaying = "\(song) - #\(artist.replacingOccurrences(of: " ", with: ""))"
+        nowPlaying = nowPlaying + "\n#NowPlaying"
+        if (trackid.contains("spotify:track:")) {
+            nowPlaying = nowPlaying + " #Spotify"
+        }
+    }
+    
+    func extractMusicInfo(ninformation: Notification) {
+        let musicinfo = ninformation.userInfo
+        if musicinfo?["Player State"] as! String != "Playing" {
+            displayLabel = ""
+            nowPlaying = ""
+            return
+        }
+        let song = musicinfo!["Name"] as! String
+        let artist = musicinfo!["Artist"] as! String
+        let trackid = musicinfo?["Track ID"] as? String ?? ""
+        makeLabel(song: song, artist: artist)
+        makeNowPlaying(song:song, artist:artist, trackid:trackid)
+    }
+}

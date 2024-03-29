@@ -8,12 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		AAFB73112BB712D6008E34AB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB73102BB712D6008E34AB /* AppDelegate.swift */; };
-		AAFB73132BB712D6008E34AB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB73122BB712D6008E34AB /* ViewController.swift */; };
 		AAFB73152BB712D7008E34AB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AAFB73142BB712D7008E34AB /* Assets.xcassets */; };
 		AAFB73182BB712D7008E34AB /* Base in Resources */ = {isa = PBXBuildFile; fileRef = AAFB73172BB712D7008E34AB /* Base */; };
 		AAFB73232BB712D7008E34AB /* Y803Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB73222BB712D7008E34AB /* Y803Tests.swift */; };
 		AAFB732D2BB712D7008E34AB /* Y803UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB732C2BB712D7008E34AB /* Y803UITests.swift */; };
 		AAFB732F2BB712D7008E34AB /* Y803UITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB732E2BB712D7008E34AB /* Y803UITestsLaunchTests.swift */; };
+		AAFB733C2BB713B6008E34AB /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB733B2BB713B6008E34AB /* StatusBarController.swift */; };
+		AAFB733E2BB71BC3008E34AB /* LabelModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAFB733D2BB71BC3008E34AB /* LabelModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,7 +37,6 @@
 /* Begin PBXFileReference section */
 		AAFB730D2BB712D6008E34AB /* Y803.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Y803.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAFB73102BB712D6008E34AB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		AAFB73122BB712D6008E34AB /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		AAFB73142BB712D7008E34AB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AAFB73172BB712D7008E34AB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		AAFB73192BB712D7008E34AB /* Y803.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Y803.entitlements; sourceTree = "<group>"; };
@@ -45,6 +45,8 @@
 		AAFB73282BB712D7008E34AB /* Y803UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Y803UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAFB732C2BB712D7008E34AB /* Y803UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Y803UITests.swift; sourceTree = "<group>"; };
 		AAFB732E2BB712D7008E34AB /* Y803UITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Y803UITestsLaunchTests.swift; sourceTree = "<group>"; };
+		AAFB733B2BB713B6008E34AB /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
+		AAFB733D2BB71BC3008E34AB /* LabelModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,7 +98,8 @@
 			isa = PBXGroup;
 			children = (
 				AAFB73102BB712D6008E34AB /* AppDelegate.swift */,
-				AAFB73122BB712D6008E34AB /* ViewController.swift */,
+				AAFB733B2BB713B6008E34AB /* StatusBarController.swift */,
+				AAFB733D2BB71BC3008E34AB /* LabelModel.swift */,
 				AAFB73142BB712D7008E34AB /* Assets.xcassets */,
 				AAFB73162BB712D7008E34AB /* Main.storyboard */,
 				AAFB73192BB712D7008E34AB /* Y803.entitlements */,
@@ -251,7 +254,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AAFB73132BB712D6008E34AB /* ViewController.swift in Sources */,
+				AAFB733E2BB71BC3008E34AB /* LabelModel.swift in Sources */,
+				AAFB733C2BB713B6008E34AB /* StatusBarController.swift in Sources */,
 				AAFB73112BB712D6008E34AB /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -428,6 +432,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -453,6 +458,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
