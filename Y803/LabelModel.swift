@@ -33,7 +33,7 @@ class LabelModel: NSObject {
         }
         return "♪\(label)"
     }
-
+    
     private func makeNowPlaying(song: String, artist: String, trackid: String) -> String {
         var postContent = "\(song)"
         if !artist.isEmpty {

@@ -12,27 +12,28 @@ class StatusBarController {
     private let mymenu = NSMenu()
     private let statusItem = NSStatusBar.system.statusItem(withLength: 200)
     private var myview = NSView(frame: NSRect(x: 0, y: 0, width: 200, height: 20))
-
+    
     // label
     private var currentLabel: String = "♪"
-    private var labelSize:Int = 0
-
+    private var labelSize:Double = 0
+    
     // controle music info
     private let labelMaker = LabelModel()
     
     // constant
     private let labelFontSize: CGFloat = 14.0
     private let labelLoopNum: Int = 10
+    private let statusBarWidth: Int = 200
     
     init(){
         // Menubar
         statusBar = NSStatusBar.init()
         prepareMenu()
-
+        
         //Notifications
         prepareReceiveNotification()
     }
-
+    
     func prepareReceiveNotification(){
         // Notification Center for Music info
         // $ strings /Volumes/Macintoh\ HD/System/Applications/Music.app/Contents/MacOS/Music | grep "com.apple."
@@ -51,33 +52,35 @@ class StatusBarController {
         let nowplaying = NSMenuItem(title: "Post NowPlaying..", action: #selector(shareNowPlaying), keyEquivalent: "t")
         nowplaying.target = self
         mymenu.addItem(nowplaying)
-
+        
         // for quit menu
         mymenu.addItem(NSMenuItem(title: "Quit", action: #selector(AppDelegate.quit(_:)), keyEquivalent: "q"))
         statusItem.menu = mymenu
-
+        
         myview.wantsLayer = true
         myview.layer?.backgroundColor = CGColor.clear
-
+        
         statusItem.button?.font = NSFont.systemFont(ofSize: CGFloat(labelFontSize))
         statusItem.button?.title = currentLabel
         statusItem.button?.addSubview(myview)
     }
-        
+    
     @objc func shareNowPlaying(){
         labelMaker.nowplaying()
     }
-
-    private func start_animation(viewlabellength: Int) {
+    
+    private func start_animation(viewLabelLength: Int) {
         let animation = CABasicAnimation(keyPath: "position")
         animation.repeatCount = .infinity
-        animation.duration = CFTimeInterval((viewlabellength/20))
+        
+        
+        animation.duration = CFTimeInterval(viewLabelLength/20)
         animation.fromValue = myview.layer?.position
-        animation.toValue = NSValue(point: NSPoint(x: -(viewlabellength + 200), y: 0))
-
+        animation.toValue = NSValue(point: NSPoint(x: -(viewLabelLength + statusBarWidth), y: 0))
+        
         myview.wantsLayer = true
         myview.layer?.add(animation, forKey: "position")
-
+        
         statusItem.button?.addSubview(myview)
     }
     
@@ -97,34 +100,39 @@ class StatusBarController {
         label.drawsBackground = false
         return label
     }
-
+    
     @objc func onTrackChange(n: Notification){
         stop_animation()
-
+        
         labelMaker.extractMusicInfo(ninformation: n)
         currentLabel = labelMaker.displayLabel
-
+        
         // Pause
         if currentLabel.unicodeScalars.count == 0 {
             statusItem.button?.title = "♪"
             return
         }
-
-        labelSize = currentLabel.count * 12 // 12がアルファベット、日本語の幅に適切
-
+        
+        let tempNsLabel = NSTextField(labelWithString: currentLabel)
+        tempNsLabel.font = NSFont.systemFont(ofSize: CGFloat(labelFontSize))
+        tempNsLabel.sizeToFit()
+        labelSize = tempNsLabel.frame.width
+        
         // Playing(Short Label)
-        if labelSize <= 195 {
+        if labelSize <= Double(statusBarWidth) * 0.9 {
             statusItem.button?.title = currentLabel
             return
         }
-
+        
         // Playing(Long Label)
         statusItem.button?.title = ""
-        let allLabelWidth = labelSize * labelLoopNum
+        let oneLabelWidth:Int = Int(labelSize) + Int(Double(statusBarWidth) * 0.5)
+        let allLabelWidth = oneLabelWidth * (labelLoopNum + 1)
         myview = NSView(frame: NSRect(x: 0, y: 0, width: allLabelWidth, height: 20))
         for index in 0...labelLoopNum {
-            myview.addSubview(makeDisplayLabel(startX: (index * labelSize) + 200, labelWidth: labelSize + 200))
+            let startX = index * Int(oneLabelWidth) + statusBarWidth
+            myview.addSubview(makeDisplayLabel(startX: startX, labelWidth: oneLabelWidth))
         }
-        start_animation(viewlabellength: allLabelWidth)
+        start_animation(viewLabelLength: Int(allLabelWidth))
     }
 }
