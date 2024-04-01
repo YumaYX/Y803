@@ -11,7 +11,6 @@ class LabelModel: NSObject {
     
     var displayLabel:String = ""
     var nowPlaying:String = ""
-    //var labelWidth: Int = 0
     
     override init(){
         super.init()

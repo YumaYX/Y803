@@ -10,8 +10,8 @@ import Cocoa
 class StatusBarController {
     private let statusBar: NSStatusBar
     private let mymenu = NSMenu()
-    private let statusItem = NSStatusBar.system.statusItem(withLength: 200)
-    private var myview = NSView(frame: NSRect(x: 0, y: 0, width: 200, height: 20))
+    private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+    private var myview = NSView()
     
     // label
     private var currentLabel: String = "♪"
@@ -24,6 +24,7 @@ class StatusBarController {
     private let labelFontSize: CGFloat = 14.0
     private let labelLoopNum: Int = 10
     private let statusBarWidth: Int = 200
+    private let statusBarHeight: Int = 24
     
     init(){
         // Menubar
@@ -58,11 +59,13 @@ class StatusBarController {
         statusItem.menu = mymenu
         
         myview.wantsLayer = true
-        myview.layer?.backgroundColor = CGColor.clear
         
-        statusItem.button?.font = NSFont.systemFont(ofSize: CGFloat(labelFontSize))
-        statusItem.button?.title = currentLabel
-        statusItem.button?.addSubview(myview)
+        if let button = statusItem.button {
+            button.frame = NSRect(x: 0, y: 0, width: statusBarHeight, height: statusBarHeight)
+            button.font = NSFont.systemFont(ofSize: CGFloat(labelFontSize))
+            button.title = currentLabel
+            button.addSubview(myview)
+        }
     }
     
     @objc func shareNowPlaying(){
@@ -72,8 +75,6 @@ class StatusBarController {
     private func start_animation(viewLabelLength: Int) {
         let animation = CABasicAnimation(keyPath: "position")
         animation.repeatCount = .infinity
-        
-        
         animation.duration = CFTimeInterval(viewLabelLength/20)
         animation.fromValue = myview.layer?.position
         animation.toValue = NSValue(point: NSPoint(x: -(viewLabelLength + statusBarWidth), y: 0))
@@ -91,7 +92,7 @@ class StatusBarController {
     }
     
     private func makeDisplayLabel(startX: Int, labelWidth: Int) -> NSView {
-        let label = NSTextField(frame: NSRect(x: startX, y: -3, width: labelWidth, height: 20))
+        let label = NSTextField(frame: NSRect(x: startX, y: -2, width: labelWidth, height: statusBarHeight))
         label.stringValue = currentLabel
         label.font = NSFont.systemFont(ofSize: CGFloat(labelFontSize))
         label.isEditable = false
@@ -110,6 +111,8 @@ class StatusBarController {
         // Pause
         if currentLabel.unicodeScalars.count == 0 {
             statusItem.button?.title = "♪"
+            let size: CGFloat = 20
+            statusItem.button?.frame = NSRect(x: 0, y: -3, width: size, height: size)
             return
         }
         
@@ -121,14 +124,16 @@ class StatusBarController {
         // Playing(Short Label)
         if labelSize <= Double(statusBarWidth) * 0.9 {
             statusItem.button?.title = currentLabel
+            statusItem.button?.frame = NSRect(x: 0, y: 0, width: statusBarWidth, height: statusBarHeight)
             return
         }
         
         // Playing(Long Label)
         statusItem.button?.title = ""
+        statusItem.button?.frame = NSRect(x: 0, y: 0, width: statusBarWidth, height: statusBarHeight)
         let oneLabelWidth:Int = Int(labelSize) + Int(Double(statusBarWidth) * 0.5)
         let allLabelWidth = oneLabelWidth * (labelLoopNum + 1)
-        myview = NSView(frame: NSRect(x: 0, y: 0, width: allLabelWidth, height: 20))
+        myview = NSView(frame: NSRect(x: 0, y: 0, width: allLabelWidth, height: statusBarHeight))
         for index in 0...labelLoopNum {
             let startX = index * Int(oneLabelWidth) + statusBarWidth
             myview.addSubview(makeDisplayLabel(startX: startX, labelWidth: oneLabelWidth))
