@@ -17,13 +17,18 @@ class LabelModel: NSObject {
     }
     
     func nowplaying(){
-        if (nowPlaying.count <= 0 ){ return }
-        let encodedText = nowPlaying.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
-        if let encodedText = encodedText,
-           let url = URL(string: "https://twitter.com/intent/tweet?text=\(encodedText)") {
+        if nowPlaying.isEmpty { return }
+
+        var components = URLComponents(string: "https://twitter.com/intent/tweet")
+        components?.queryItems = [
+            URLQueryItem(name: "text", value: nowPlaying)
+        ]
+
+        if let url = components?.url {
             NSWorkspace.shared.open(url)
         }
     }
+
     
     private func makeLabel(song: String, artist: String) -> String {
         var label = song
