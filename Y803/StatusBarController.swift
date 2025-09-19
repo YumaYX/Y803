@@ -15,7 +15,7 @@ class StatusBarController {
     
     // label
     private var currentLabel: String = "♪"
-    private var labelSize:Double = 0
+    private var labelSize: Double = 0
     
     // controle music info
     private let labelMaker = LabelModel()
@@ -31,38 +31,52 @@ class StatusBarController {
         statusBar = NSStatusBar.init()
         prepareMenu()
         
-        //Notifications
+        // Notifications
         prepareReceiveNotification()
     }
     
     func prepareReceiveNotification(){
-        // Notification Center for Music info
-        // $ strings /Volumes/Macintoh\ HD/System/Applications/Music.app/Contents/MacOS/Music | grep "com.apple."
-        // com.apple.Music.playerInfo or com.apple.iTunes.playerInfo
-        // and
-        // Notification Center for Spotify app info
-        // $ strings /Applications/Spotify.app/Contents/MacOS/Spotify | grep "com.spotify.client"
-        let notification_names: Array<String> = ["com.apple.Music.playerInfo", "com.spotify.client.PlaybackStateChanged"]
+        let notification_names: Array<String> = [
+            "com.apple.Music.playerInfo",
+            "com.spotify.client.PlaybackStateChanged"
+        ]
         for notification in notification_names {
-            DistributedNotificationCenter.default().addObserver(self, selector: #selector(self.onTrackChange(n:)), name: NSNotification.Name(notification), object: nil)
+            DistributedNotificationCenter.default().addObserver(
+                self,
+                selector: #selector(self.onTrackChange(n:)),
+                name: NSNotification.Name(notification),
+                object: nil
+            )
         }
     }
     
     func prepareMenu(){
         // for share menu
-        let nowplaying = NSMenuItem(title: "Post NowPlaying..", action: #selector(shareNowPlaying), keyEquivalent: "t")
+        let nowplaying = NSMenuItem(
+            title: "Post NowPlaying..",
+            action: #selector(shareNowPlaying),
+            keyEquivalent: "t"
+        )
         nowplaying.target = self
         mymenu.addItem(nowplaying)
         
         // for quit menu
-        mymenu.addItem(NSMenuItem(title: "Quit", action: #selector(AppDelegate.quit(_:)), keyEquivalent: "q"))
+        mymenu.addItem(
+            NSMenuItem(
+                title: "Quit",
+                action: #selector(AppDelegate.quit(_:)),
+                keyEquivalent: "q"
+            )
+        )
         statusItem.menu = mymenu
         
         myview.wantsLayer = true
         
         if let button = statusItem.button {
-            button.frame = NSRect(x: 0, y: 0, width: statusBarHeight, height: statusBarHeight)
-            button.font = NSFont.systemFont(ofSize: CGFloat(labelFontSize))
+            button.wantsLayer = true                      // 追加: レイヤー化
+            button.layer?.masksToBounds = true            // はみ出し防止
+            button.frame = NSRect(x: 0, y: 0, width: statusBarWidth, height: statusBarHeight)
+            button.font = NSFont.systemFont(ofSize: labelFontSize)
             button.title = currentLabel
             button.addSubview(myview)
         }
@@ -73,34 +87,55 @@ class StatusBarController {
     }
     
     private func start_animation(viewLabelLength: Int) {
-        let animation = CABasicAnimation(keyPath: "position")
+        myview.wantsLayer = true
+        guard let layer = myview.layer else { return }
+    
+        // レイヤーの初期位置を調整
+        layer.anchorPoint = CGPoint(x: 0.0, y: 0.5)
+        layer.position = CGPoint(x: 0, y: CGFloat(statusBarHeight) / 2.0)
+    
+        // アニメーションの設定
+        let animation = CABasicAnimation(keyPath: "position.x")
         animation.repeatCount = .infinity
         animation.duration = CFTimeInterval(viewLabelLength/20)
-        animation.fromValue = myview.layer?.position
-        animation.toValue = NSValue(point: NSPoint(x: -(viewLabelLength + statusBarWidth), y: 0))
-        
-        myview.wantsLayer = true
-        myview.layer?.add(animation, forKey: "position")
-        
-        statusItem.button?.addSubview(myview)
+        animation.fromValue = 0.0
+        animation.toValue = -CGFloat(viewLabelLength)
+        animation.timingFunction = CAMediaTimingFunction(name: .linear)
+    
+        layer.add(animation, forKey: "slideX")
+    
+        if myview.superview == nil {
+            statusItem.button?.addSubview(myview)
+        }
     }
     
     private func stop_animation() {
         myview.layer?.removeAllAnimations()
         for subview in myview.subviews { subview.removeFromSuperview() }
-        for subview in statusItem.button!.subviews { subview.removeFromSuperview() }
+        myview.removeFromSuperview()
     }
     
-    private func makeDisplayLabel(startX: Int, labelWidth: Int) -> NSView {
-        let label = NSTextField(frame: NSRect(x: startX, y: -2, width: labelWidth, height: statusBarHeight))
-        label.stringValue = currentLabel
-        label.font = NSFont.systemFont(ofSize: CGFloat(labelFontSize))
-        label.isEditable = false
-        label.isSelectable = false
-        label.isBezeled = false
-        label.drawsBackground = false
-        return label
-    }
+// ...existing code...
+private func makeDisplayLabel(startX: Int, labelWidth: Int) -> NSView {
+    let container = NSView(frame: NSRect(x: startX, y: -2, width: labelWidth, height: statusBarHeight))
+    container.wantsLayer = true
+
+    let textLayer = CATextLayer()
+    textLayer.string = currentLabel
+    textLayer.font = NSFont.systemFont(ofSize: labelFontSize)
+    textLayer.fontSize = labelFontSize
+
+    textLayer.frame = container.bounds
+    textLayer.alignmentMode = .left
+    textLayer.contentsScale = NSScreen.main?.backingScaleFactor ?? 2.0
+    textLayer.isWrapped = false
+    textLayer.truncationMode = .none
+    textLayer.foregroundColor = NSColor.labelColor.cgColor
+    textLayer.foregroundColor = NSColor.white.cgColor
+
+    container.layer?.addSublayer(textLayer)
+    return container
+}
     
     @objc func onTrackChange(n: Notification){
         stop_animation()
@@ -117,7 +152,7 @@ class StatusBarController {
         }
         
         let tempNsLabel = NSTextField(labelWithString: currentLabel)
-        tempNsLabel.font = NSFont.systemFont(ofSize: CGFloat(labelFontSize))
+        tempNsLabel.font = NSFont.systemFont(ofSize: labelFontSize)
         tempNsLabel.sizeToFit()
         labelSize = tempNsLabel.frame.width
         
@@ -131,13 +166,20 @@ class StatusBarController {
         // Playing(Long Label)
         statusItem.button?.title = ""
         statusItem.button?.frame = NSRect(x: 0, y: 0, width: statusBarWidth, height: statusBarHeight)
-        let oneLabelWidth:Int = Int(labelSize) + Int(Double(statusBarWidth) * 0.5)
+        
+        let oneLabelWidth: Int = Int(labelSize) + Int(Double(statusBarWidth) * 0.5)
         let allLabelWidth = oneLabelWidth * (labelLoopNum + 1)
+        
         myview = NSView(frame: NSRect(x: 0, y: 0, width: allLabelWidth, height: statusBarHeight))
+        myview.wantsLayer = true
+        
         for index in 0...labelLoopNum {
-            let startX = index * Int(oneLabelWidth) + statusBarWidth
+            let startX = index * oneLabelWidth + statusBarWidth
             myview.addSubview(makeDisplayLabel(startX: startX, labelWidth: oneLabelWidth))
         }
-        start_animation(viewLabelLength: Int(allLabelWidth))
+        
+        start_animation(viewLabelLength: allLabelWidth)
     }
 }
+
+
